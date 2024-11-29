@@ -1,38 +1,64 @@
-.App {
-  text-align: center;
+/* General Reset */
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-image: url('https://jammingyoutube.surge.sh/static/media/background_photo_desktop.a0687f3fe6f1303a2d18.jpg');
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.jamming {
+  color: violet;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.app-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  flex-direction: column; /* Column layout for the app */
+  align-items: center; /* Center content horizontally */
+  padding: 20px;
 }
 
-.App-link {
-  color: #61dafb;
+.search-bar-container {
+  margin-bottom: 20px; /* Spacing below the search bar */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Main Content Layout */
+.main-content {
+  display: flex;
+  flex-direction: row; /* Horizontal layout */
+  gap: 20px; /* Space between the two containers */
+  width: 100%;
+  max-width: 1200px;
+  align-items: stretch; /* Ensure both containers are vertically aligned */
 }
+
+/* Containers for Search Results and Track List */
+.search-results-container,
+.playlist-container {
+  flex: 1; /* Take equal space */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex; /* Flexbox ensures content alignment */
+  flex-direction: column; /* Align internal elements vertically */
+}
+
+/* Ensure consistent height */
+.search-results-container,
+.playlist-container {
+  min-height: 400px; /* Set a minimum height */
+}
+
+/* Search Bar Styling */
+input[type="text"] {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
