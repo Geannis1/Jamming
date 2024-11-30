@@ -1,54 +1,102 @@
 import React, { useState } from 'react';
 import './App.css';
-import { tracks } from './Tracklist';
+import Spotify from './Spotify';
 import SearchBar from './SearchBar';
-import SearchResults from './SearchResults';
+import SearchResult from './SearchResult';
 import Playlist from './Playlist';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [playlistName, setPlaylistName] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [playlistName, setPlaylistName] = useState('New Playlist');
   const [playlistTracks, setPlaylistTracks] = useState([]);
+  const [savedPlaylists, setSavedPlaylists] = useState([]);
+  const [editingPlaylist, setEditingPlaylist] = useState(null);
 
-  const filteredTracks = tracks.filter((track) =>
-    track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    track.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    track.genre.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Handle search functionality
+  const handleSearch = async (term) => {
+    try {
+      const results = await Spotify.search(term);
+      setSearchResults(results); // Update search results with Spotify data
+    } catch (error) {
+      console.error('Error searching Spotify:', error);
+    }
+  };
 
+  // Add a track to the playlist
   const addTrackToPlaylist = (track) => {
-    if (!playlistTracks.find((t) => t.title === track.title)) {
+    if (!playlistTracks.find((t) => t.uri === track.uri)) {
       setPlaylistTracks([...playlistTracks, track]);
     }
-  }
+  };
 
-  const saveToSpotify = () => {
-    alert(`Saving ${playlistName} to Spotify with ${playlistTracks.length} tracks.`)
+  // Remove a track from the playlist
+  const removeTrackFromPlaylist = (trackToRemove) => {
+    setPlaylistTracks(playlistTracks.filter((track) => track.uri !== trackToRemove.uri));
+  };
 
-    setPlaylistTracks([]);
-  }
+  // Rename an existing playlist
+  const renamePlaylist = (name) => {
+    const playlistToEdit = savedPlaylists.find((playlist) => playlist.name === name);
+    if (playlistToEdit) {
+      setPlaylistName(playlistToEdit.name); // Update the playlist name
+      setPlaylistTracks(playlistToEdit.tracks); // Load the tracks for the playlist
+      setEditingPlaylist(name); // Set the playlist being edited
+    }
+  };
+
+  // Save or rename the playlist (Updated function)
+  const saveToSpotify = async () => {
+    const trackUris = playlistTracks.map((track) => track.uri);
+  
+    if (trackUris.length === 0) {
+      alert('Your playlist is empty. Add some tracks before saving.');
+      return;
+    }
+  
+    try {
+      const message = await Spotify.savePlaylist(playlistName, trackUris);
+      alert(message); // Confirm successful save
+      setPlaylistTracks([]); // Clear playlist after saving
+    } catch (error) {
+      console.error('Error saving playlist to Spotify:', error);
+      alert('There was an error saving your playlist to Spotify.');
+    }
+  };
 
   return (
     <div className="app-container">
-      <h1 className="jamming">Jamming</h1>
       {/* Search Bar */}
       <div className="search-bar-container">
-        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onSearch={handleSearch}
+        />
       </div>
 
       {/* Main Content */}
       <div className="main-content">
+        {/* Search Results */}
         <div className="search-results-container">
           <h2>Search Results</h2>
-          <SearchResults filteredTracks={filteredTracks} addTrack={addTrackToPlaylist} />
+          <SearchResult
+            filteredTracks={searchResults}
+            addTrack={addTrackToPlaylist}
+          />
         </div>
+
+        {/* Playlist */}
         <div className="playlist-container">
           <h2>Playlist</h2>
-          <Playlist 
+          <Playlist
             playlistName={playlistName}
             setPlaylistName={setPlaylistName}
             playlistTracks={playlistTracks}
             saveToSpotify={saveToSpotify}
+            removeTrack={removeTrackFromPlaylist}
+            savedPlaylists={savedPlaylists}
+            renamePlaylist={renamePlaylist}
           />
         </div>
       </div>
